@@ -1,0 +1,19 @@
+version: "3.4"
+
+services:
+
+  mail:
+    image: educonn/mail:latest
+    environment:
+      DEBUG: 1
+      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY_ADDRESS: "50051"
+      SMTP_HOST: "smtp.mailtrap.io"
+      SMTP_PORT: 2525
+      SMTP_USERNAME: "0f92ba981e4a2f"
+      SMTP_PASSWORD: "09f0dcb79f8f24"
+
+  mail-cli:
+    image: educonn/mail-cli:latest
+    environment:
+      MICRO_REGISTRY: "mdns"
