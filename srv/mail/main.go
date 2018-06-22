@@ -8,35 +8,18 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/micro/cli"
 	"os"
-	"gopkg.in/gomail.v2"
 )
 
 type service struct {
 	config SmtpConfig
 }
 
+var emailChan = make(chan *pb.EmailRequest, 1000)
+
 func (s *service) SendEmail(ctx context.Context, req *pb.EmailRequest, res *pb.Response) error {
 
-	log.Debugf("EmailRequest received: TO='%s' SUBJECT='%s'", req.To, req.Subject)
-
-	mail := gomail.NewMessage()
-	mail.SetHeader("From", req.From)
-	mail.SetHeader("To", req.To)
-	mail.SetHeader("Subject", req.Subject)
-	mail.SetBody("text/html", req.Message)
-
-	if err := DialAndSendEmail(&s.config, *mail); err != nil {
-		res.Code = 500
-		res.Message = "EMAIL_SEND_FAIL"
-		log.Warn(err)
-
-		return nil
-	}
-
-	res.Code = 200
-	res.Message = "EMAIL_SEND_SUCCESS"
-	log.Debug("EmailRequest handled successfully, mail was sent!")
-
+	emailChan <- req
+	log.Debugf("EmailRequest received and added to channel: TO='%s' SUBJECT='%s'", req.To, req.Subject)
 	return nil
 }
 
@@ -108,10 +91,21 @@ func main() {
 	)
 
 	log.Infof("SMTP is configured at: %s:%d", smtpConfig.Hostname, smtpConfig.Port)
+	NewDialer(&smtpConfig)
+	log.Debugf("SMTP Dialer created")
 
 	pb.RegisterEmailServiceHandler(srv.Server(), &service{smtpConfig})
+
+	log.Debugf("Starting mail queue...")
+
+	go func() {
+		for email := range emailChan {
+			SendMail(smtpConfig, email)
+		}
+	}()
 
 	if err := srv.Run(); err != nil {
 		fmt.Println(err)
 	}
+
 }
