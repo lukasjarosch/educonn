@@ -3,5 +3,5 @@
 
 ## Run mail-cli service
 ```
- docker-compose -f docker-compose.local.yml run mail-service --to="" --from="" --body="" --subject=""
+ docker-compose -f docker-compose.local.yml run mail-cli --to="" --from="" --body="" --subject=""
 ```
