@@ -26,6 +26,7 @@ func (s *service) SendEmail(ctx context.Context, req *pb.EmailRequest, res *pb.R
 func main() {
 
 	log.SetLevel(log.InfoLevel)
+	defer close(emailChan)
 
 	smtpConfig := SmtpConfig{}
 
