@@ -47,7 +47,7 @@ func main() {
 			subject := c.String("subject")
 			body := c.String("body")
 
-			r, err := client.SendEmail(context.TODO(), &pb.EmailRequest{
+			_, err := client.SendEmail(context.TODO(), &pb.EmailRequest{
 				To:      to,
 				From:    from,
 				Subject: subject,
@@ -57,10 +57,6 @@ func main() {
 			if err != nil {
 				log.Fatalf("Unable to send mail: %v", err)
 			}
-
-			log.Infof("Status: %d", r.Code)
-			log.Infof("Message: %v", r.Message)
-
 			os.Exit(0)
 		}),
 	)
