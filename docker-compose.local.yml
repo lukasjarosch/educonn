@@ -2,18 +2,27 @@ version: "3.4"
 
 services:
 
+  consul:
+    image: consul
+
+
   mail:
     image: educonn/mail:latest
     environment:
       DEBUG: 1
-      MICRO_REGISTRY: "mdns"
-      MICRO_REGISTRY_ADDRESS: "50051"
+      MICRO_REGISTRY: "consul"
+      MICRO_REGISTRY_ADDRESS: "consul"
       SMTP_HOST: "smtp.mailtrap.io"
       SMTP_PORT: 2525
       SMTP_USERNAME: "0f92ba981e4a2f"
       SMTP_PASSWORD: "09f0dcb79f8f24"
+    depends_on:
+      - consul
 
   mail-cli:
     image: educonn/mail-cli:latest
     environment:
-      MICRO_REGISTRY: "mdns"
+      MICRO_REGISTRY: "consul"
+      MICRO_REGISTRY_ADDRESS: "consul"
+    depends_on:
+      - mail
