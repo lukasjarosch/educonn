@@ -8,5 +8,5 @@ clean:
 
 run:
 	docker run -it \
-	    -e MICRO_REGISTRY="mdns" \
+	    -e MICRO_REGISTRY="consul" \
 	    educonn/mail-cli --to="hans@peter.com" --from="dein@portal.com" --subject="Irgendwas" --body="Noch mehr Nonsens"
