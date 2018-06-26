@@ -6,6 +6,7 @@ services:
     image: consul
 
 
+  ### mail #############################################
   mail:
     image: educonn/mail:latest
     environment:
@@ -19,6 +20,7 @@ services:
     depends_on:
       - consul
 
+  ### mail-cli ########################################
   mail-cli:
     image: educonn/mail-cli:latest
     environment:
@@ -26,3 +28,30 @@ services:
       MICRO_REGISTRY_ADDRESS: "consul"
     depends_on:
       - mail
+
+
+  ### user ###########################################
+  user:
+    image: educonn/user:latest
+    environment:
+      MICRO_REGISTRY: "consul"
+      MICRO_REGISTRY_ADDRESS: "consul"
+      DEBUG: 1
+      DB_HOST: "user-db"
+      DB_NAME: "users"
+      DB_USERNAME:  "users"
+      DB_PASSWORD:  "secret"
+      DB_PORT: "3306"
+    depends_on:
+      - user-db
+
+  ### user-db ########################################
+  user-db:
+    image: mysql:5.7
+    environment:
+      MYSQL_USER: "users"
+      MYSQL_PASSWORD: "secret"
+      MYSQL_DATABASE: "users"
+      MYSQL_ROOT_PASSWORD: "superSecret"
+    ports:
+      - 3306:3306
