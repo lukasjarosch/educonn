@@ -6,13 +6,15 @@ import (
 	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	log "github.com/sirupsen/logrus"
 	"github.com/satori/go.uuid"
+	"time"
+	"github.com/go-sql-driver/mysql"
 )
 
 type Respository interface {
 	GetAll() ([]*pb.User, error)
 	Get(id string) (*pb.User, error)
 	Create(user *pb.User) (*pb.User, error)
-	GetByEmailAndPassword(user *pb.User) (*pb.User, error)
+	GetByEmail(user *pb.User) (*pb.User, error)
 }
 
 type UserRepository struct {
@@ -20,12 +22,14 @@ type UserRepository struct {
 	userStruct *sqlbuilder.Struct
 }
 
+// GetAll users where deleted_at is NULL
 func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 	var users []*pb.User
 
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select("id", "email", "first_name", "last_name")
+	sb.Select("id", "email", "first_name", "last_name", "password")
 	sb.From("users")
+	sb.Where(sb.IsNull("deleted_at"))
 
 	sql, args := sb.Build()
 	rows, err := repo.db.Query(sql, args...)
@@ -37,7 +41,7 @@ func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 	for rows.Next() {
 		user := &pb.User{}
 		users = append(users, user)
-		err := rows.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName)
+		err := rows.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName, &user.Password)
 		if err != nil {
 		    log.Warnf("Error iterating result rows: %v", err)
 		    return nil, err
@@ -49,25 +53,28 @@ func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 	return users, nil
 }
 
+// Get a user by ID
 func (repo *UserRepository) Get(id string) (*pb.User, error) {
 	user := &pb.User{}
 
 	sb := sqlbuilder.NewSelectBuilder()
-	sb.Select("id", "email", "first_name", "last_name")
+	sb.Select("id", "email", "first_name", "last_name", "password")
 	sb.From("users")
-	sb.Where(sb.Equal("id", id))
+	sb.Where(
+		sb.Equal("id", id),
+		sb.IsNull("deleted_at"))
 	sb.Limit(1)
 
 	sql, args := sb.Build()
 	row, err := repo.db.Query(sql, args...)
-	defer row.Close()
 	if err != nil {
 	    log.Warnf("Error querying database: %v", err)
 	    return nil, err
 	}
+	defer row.Close()
 
 	row.Next()
-	err = row.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName)
+	err = row.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName, &user.Password)
 	if err != nil {
 	    log.Warnf("Error scanning result: %v", err)
 	}
@@ -76,14 +83,37 @@ func (repo *UserRepository) Get(id string) (*pb.User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) GetByEmailAndPassword(user *pb.User) (*pb.User, error) {
-	/*
-		if err := repo.db.First(&user).Error; err != nil {
-			return nil, err
-		}
-		return user, nil
-	*/
-	return nil, nil
+func (repo *UserRepository) GetByEmail(user *pb.User) (*pb.User, error) {
+	fetchedUser := &pb.User{}
+
+
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select("id", "email", "first_name", "last_name", "password")
+	sb.From("users")
+	sb.Where(
+		sb.Equal("email", user.Email),
+		sb.IsNull("deleted_at"))
+	sb.Limit(1)
+
+
+	sql, args := sb.Build()
+	log.Debugf("SQL: %v", sql)
+	row, err := repo.db.Query(sql, args...)
+	if err != nil {
+	    log.Warnf("Error querying database: %v", err)
+	    return nil, err
+	}
+	defer row.Close()
+
+	row.Next()
+	err = row.Scan(&fetchedUser.Id, &fetchedUser.Email, &fetchedUser.FirstName, &fetchedUser.LastName, &fetchedUser.Password)
+	if err != nil {
+		log.Warnf("Error scanning result: %v", err)
+	}
+
+	log.Debugf("Fetched user '%s' by mail '%s' from database", fetchedUser.Id, fetchedUser.Email)
+
+	return fetchedUser, nil
 }
 
 func (repo *UserRepository) Create(user *pb.User) (*pb.User, error) {
@@ -94,6 +124,12 @@ func (repo *UserRepository) Create(user *pb.User) (*pb.User, error) {
 		LastName:  user.LastName,
 		Email:     user.Email,
 		Password:  user.Password,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		DeletedAt: mysql.NullTime{
+			Valid: false,
+			Time: time.Now(),
+		},
 	}
 	ib := repo.userStruct.InsertInto("users", u)
 

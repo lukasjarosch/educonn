@@ -18,7 +18,7 @@ type  SmtpConfig struct {
 func SendMail(config SmtpConfig, event *user.UserCreatedEvent) {
 
 	from := "hallo@educonn.de"
-	subject := "Willkommen auf EduConn, %s"
+	subject := "Willkommen auf EduConn %s"
 	message := "Something great is about to happen..."
 
 	mail := gomail.NewMessage()

@@ -5,6 +5,8 @@ import (
 	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/crypto/bcrypt"
+	"errors"
 )
 
 type service struct {
@@ -34,17 +36,32 @@ func (srv *service) GetAll(ctx context.Context, req *pb.Request, res *pb.UserRes
 }
 
 func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error {
-	_, err := srv.repo.GetByEmailAndPassword(req)
+	user, err := srv.repo.GetByEmail(req)
 	if err != nil {
 		return err
 	}
-	res.Token = "testing123"
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		return err
+	}
+
+	token, err := srv.tokenService.Encode(user)
+	if err != nil {
+	    return err
+	}
+
+	res.Token = token
 	return nil
 }
 
 // Create a new user and publish an UserCreatedEvent. If the user could not be created, the error will be stuffed in the
 // UserResponse
 func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+	    return err
+	}
+	req.Password = string(hashedPassword)
 	user, err := srv.repo.Create(req)
 
 	if err != nil {
@@ -64,5 +81,15 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserRespon
 }
 
 func (srv *service) ValidateToken(ctx context.Context, req *pb.Token, res *pb.Token) error {
+	claims, err := srv.tokenService.Decode(req.Token)
+	if err != nil {
+	    return err
+	}
+
+	if claims.User.Id == "" {
+		return errors.New("invalid user")
+	}
+
+	res.Valid = true
 	return nil
 }

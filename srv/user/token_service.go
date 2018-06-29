@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	key = []byte("superSecretKey")
+	key = []byte("wOhijsru7hMD5cPWshoy2fo351IzR0uCAIpFHAL6DiJzClQ1H_NCBEAhMgee9gDiD6QNdFAjwmirgyMbbIcM6w==")
 )
 
 type CustomClaims struct {

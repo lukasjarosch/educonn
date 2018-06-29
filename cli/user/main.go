@@ -5,12 +5,12 @@ import (
 	microclient "github.com/micro/go-micro/client"
 	"context"
 	"github.com/prometheus/common/log"
+	"os"
 )
 
 func main() {
 	client := pb.NewUserServiceClient("go.micro.srv.user", microclient.DefaultClient)
 
-	/*
 	firstName := "Lukas"
 	lastName := "Jarosch"
 	email := "lukas.jarosch@mail.com"
@@ -36,7 +36,16 @@ func main() {
 	}
 
 	log.Infof("Created user: %s (%s)", r.User.Id, r.User.Email)
-	*/
+
+	authResp, err := client.Auth(context.TODO(), &pb.User{
+		Email: email,
+		Password: password,
+	})
+	if err != nil {
+	    log.Warnf("Unable to authenticate user: %v", err)
+	}
+
+	log.Infof("Access token: %s", authResp.Token)
 
 	/*
 	r, err := client.GetAll(context.TODO(), &pb.Request{})
@@ -45,11 +54,11 @@ func main() {
 	}
 
 	log.Warn(r)
-	*/
-	r, err := client.Get(context.TODO(), &pb.User{Id: "16ec5467-3944-4edc-b1f7-16e5c6517034"})
+	r, err = client.Get(context.TODO(), &pb.User{Id: r.User.Id})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Warn(r)
+	log.Debug(r)
+	*/
 }
