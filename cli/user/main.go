@@ -3,14 +3,14 @@ package main
 import (
 	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	microclient "github.com/micro/go-micro/client"
-	log "github.com/sirupsen/logrus"
 	"context"
-	"os"
+	"github.com/prometheus/common/log"
 )
 
 func main() {
 	client := pb.NewUserServiceClient("go.micro.srv.user", microclient.DefaultClient)
 
+	/*
 	firstName := "Lukas"
 	lastName := "Jarosch"
 	email := "lukas.jarosch@mail.com"
@@ -36,4 +36,12 @@ func main() {
 	}
 
 	log.Infof("Created user: %s (%s)", r.User.Id, r.User.Email)
+	*/
+
+	r, err := client.GetAll(context.TODO(), &pb.Request{})
+	if err != nil {
+	    log.Fatal(err)
+	}
+
+	log.Warn(r)
 }

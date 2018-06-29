@@ -22,6 +22,7 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.UserResponse)
 	return nil
 }
 
+// GetAll users
 func (srv *service) GetAll(ctx context.Context, req *pb.Request, res *pb.UserResponse) error {
 	users, err := srv.repo.GetAll()
 	if err != nil {
@@ -40,6 +41,8 @@ func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error
 	return nil
 }
 
+// Create a new user and publish an UserCreatedEvent. If the user could not be created, the error will be stuffed in the
+// UserResponse
 func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
 	user, err := srv.repo.Create(req)
 

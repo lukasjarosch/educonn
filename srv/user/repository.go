@@ -21,14 +21,31 @@ type UserRepository struct {
 }
 
 func (repo *UserRepository) GetAll() ([]*pb.User, error) {
-	/*
-		var users []*pb.User
-		if err := repo.db.Find(&users).Error; err != nil {
-			return nil, err
+	var users []*pb.User
+
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select("id", "email", "first_name", "last_name")
+	sb.From("users")
+
+	sql, args := sb.Build()
+	rows, err := repo.db.Query(sql, args...)
+	defer rows.Close()
+	if err != nil {
+	    return nil, err
+	}
+
+	for rows.Next() {
+		user := &pb.User{}
+		users = append(users, user)
+		err := rows.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName)
+		if err != nil {
+		    log.Warnf("Error iterating result rows: %v", err)
 		}
-		return users, nil
-	*/
-	return nil, nil
+	}
+
+	log.Debugf("Fetched %d users from database", len(users))
+
+	return users, nil
 }
 
 func (repo *UserRepository) Get(id string) (*pb.User, error) {
