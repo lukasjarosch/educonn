@@ -38,9 +38,17 @@ func main() {
 	log.Infof("Created user: %s (%s)", r.User.Id, r.User.Email)
 	*/
 
+	/*
 	r, err := client.GetAll(context.TODO(), &pb.Request{})
 	if err != nil {
 	    log.Fatal(err)
+	}
+
+	log.Warn(r)
+	*/
+	r, err := client.Get(context.TODO(), &pb.User{Id: "16ec5467-3944-4edc-b1f7-16e5c6517034"})
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	log.Warn(r)

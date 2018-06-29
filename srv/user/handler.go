@@ -13,6 +13,7 @@ type service struct {
 	pubCreated   micro.Publisher
 }
 
+// Get a specific user
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {

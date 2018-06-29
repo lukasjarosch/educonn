@@ -40,6 +40,7 @@ func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 		err := rows.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName)
 		if err != nil {
 		    log.Warnf("Error iterating result rows: %v", err)
+		    return nil, err
 		}
 	}
 
@@ -49,15 +50,30 @@ func (repo *UserRepository) GetAll() ([]*pb.User, error) {
 }
 
 func (repo *UserRepository) Get(id string) (*pb.User, error) {
-	/*
-		var user *pb.User
-		user.Id = id
-		if err := repo.db.First(&user).Error; err != nil {
-			return nil, err
-		}
-		return user, nil
-	*/
-	return nil, nil
+	user := &pb.User{}
+
+	sb := sqlbuilder.NewSelectBuilder()
+	sb.Select("id", "email", "first_name", "last_name")
+	sb.From("users")
+	sb.Where(sb.Equal("id", id))
+	sb.Limit(1)
+
+	sql, args := sb.Build()
+	row, err := repo.db.Query(sql, args...)
+	defer row.Close()
+	if err != nil {
+	    log.Warnf("Error querying database: %v", err)
+	    return nil, err
+	}
+
+	row.Next()
+	err = row.Scan(&user.Id, &user.Email, &user.FirstName, &user.LastName)
+	if err != nil {
+	    log.Warnf("Error scanning result: %v", err)
+	}
+	log.Debugf("Fetched user '%s' from database", user.Id)
+
+	return user, nil
 }
 
 func (repo *UserRepository) GetByEmailAndPassword(user *pb.User) (*pb.User, error) {
