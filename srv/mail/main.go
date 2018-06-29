@@ -1,27 +1,39 @@
 package main
 
 import (
-	pb "github.com/lukasjarosch/educonn/srv/mail/proto"
-	"github.com/micro/go-micro"
 	"context"
 	"fmt"
-	log "github.com/sirupsen/logrus"
-	"github.com/micro/cli"
 	"os"
+
+	user "github.com/lukasjarosch/educonn/srv/user/proto/user"
+	"github.com/micro/cli"
+	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/server"
+	"github.com/micro/go-plugins/broker/rabbitmq"
+	log "github.com/sirupsen/logrus"
 )
 
 type service struct {
 	config SmtpConfig
 }
 
-var emailChan = make(chan *pb.EmailRequest, 1000)
+type Sub struct{}
 
-func (s *service) SendEmail(ctx context.Context, req *pb.EmailRequest, res *pb.Response) error {
+func (s *Sub) Process(ctx context.Context, event *user.UserCreatedEvent) error {
+	log.Debugf("Received event: '%s': %+v", UserCreatedTopic, event)
 
-	emailChan <- req
-	log.Debugf("EmailRequest received and added to channel: TO='%s' SUBJECT='%s'", req.To, req.Subject)
+	emailChan <- event
+	log.Debugf("Queue ADD: userCreated: %s", event.Email)
+
 	return nil
 }
+
+var (
+	ExchangeName     = "user"
+	UserCreatedTopic = "user.events.created"
+	UserCreatedQueue = "user-created-queue"
+	emailChan        = make(chan *user.UserCreatedEvent)
+)
 
 func main() {
 
@@ -35,33 +47,32 @@ func main() {
 		micro.Version("1.0.0"),
 		micro.Flags(
 			cli.StringFlag{
-				Name: "smtp_host",
+				Name:   "smtp_host",
 				EnvVar: "SMTP_HOST",
-				Usage: "The host where the STMP server is running",
+				Usage:  "The host where the STMP server is running",
 			},
 			cli.IntFlag{
-				Name: "smtp_port",
+				Name:   "smtp_port",
 				EnvVar: "SMTP_PORT",
-				Usage: "Port of the SMTP server",
+				Usage:  "Port of the SMTP server",
 			},
 			cli.StringFlag{
-				Name: "smtp_password",
+				Name:   "smtp_password",
 				EnvVar: "SMTP_PASSWORD",
-				Usage: "Password for the SMTP server",
+				Usage:  "Password for the SMTP server",
 			},
 			cli.StringFlag{
-				Name: "smtp_username",
+				Name:   "smtp_username",
 				EnvVar: "SMTP_USERNAME",
-				Usage: "Username for the SMTP server",
+				Usage:  "Username for the SMTP server",
 			},
 			cli.BoolFlag{
-				Name: "debug",
+				Name:   "debug",
 				EnvVar: "DEBUG",
-				Usage: "Enable debug mode. Disabled by default",
+				Usage:  "Enable debug mode. Disabled by default",
 			},
 		),
 	)
-
 
 	srv.Init(
 		micro.Action(func(c *cli.Context) {
@@ -72,7 +83,6 @@ func main() {
 				log.SetLevel(log.DebugLevel)
 				log.Debug("DEBUG ENABLED")
 			}
-
 
 			if smtpHost == "" {
 				log.Errorf("SMTP_HOST not set. Cannot continue!")
@@ -91,19 +101,41 @@ func main() {
 		}),
 	)
 
+	// SMTP
 	log.Infof("SMTP is configured at: %s:%d", smtpConfig.Hostname, smtpConfig.Port)
 	NewDialer(&smtpConfig)
 	log.Debugf("SMTP Dialer created")
 
-	pb.RegisterEmailServiceHandler(srv.Server(), &service{smtpConfig})
+	// RabbitMQ
+	broker := srv.Server().Options().Broker
+	if err := broker.Init(rabbitmq.Exchange(ExchangeName)); err != nil {
+		log.Fatalf("Unable to init broker: %v", err)
+		os.Exit(1)
+	}
+	if err := broker.Connect(); err != nil {
+		log.Fatalf("Unable to connect to broker: %v", err)
+		os.Exit(1)
+	}
+	log.Debugf("Connected to RabbitMQ exchange '%s'", ExchangeName)
 
-	log.Debugf("Starting mail queue...")
+	micro.RegisterSubscriber(UserCreatedTopic, srv.Server(), new(Sub), server.SubscriberQueue(UserCreatedQueue))
+	micro.Broker(broker)
 
 	go func() {
 		for email := range emailChan {
 			SendMail(smtpConfig, email)
 		}
 	}()
+	//// ----- ////
+
+	/*
+		pb.RegisterEmailServiceHandler(srv.Server(), &service{smtpConfig})
+
+		log.Debugf("Starting mail queue...")
+
+	*/
+
+	//// ----- ////
 
 	if err := srv.Run(); err != nil {
 		fmt.Println(err)

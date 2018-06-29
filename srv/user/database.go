@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/jinzhu/gorm"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	log "github.com/sirupsen/logrus"
 	"fmt"
+	"database/sql"
 )
 
 type DbConfig struct {
@@ -15,10 +16,9 @@ type DbConfig struct {
 	Name string
 }
 
-func CreateConnection(cfg DbConfig) (*gorm.DB, error) {
+func CreateConnection(cfg DbConfig) (*sql.DB, error) {
 	log.Debugf("Connecting to MySQL on '%s' to database '%s'", cfg.Host, cfg.Name)
-	return gorm.Open(
-		"mysql",
-		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local",
+	return sql.Open("mysql",
+		fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 			cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Name))
 }

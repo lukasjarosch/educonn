@@ -1,12 +1,18 @@
 package main
 
 import (
-	"github.com/micro/go-micro"
-	"github.com/micro/cli"
-	log "github.com/sirupsen/logrus"
-	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	"os"
+
+	"github.com/huandu/go-sqlbuilder"
+	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
+	"github.com/micro/cli"
+	"github.com/micro/go-micro"
+	"github.com/micro/go-plugins/broker/rabbitmq"
+	_ "github.com/micro/go-plugins/broker/rabbitmq"
+	log "github.com/sirupsen/logrus"
 )
+
+const ExchangeName = "user"
 
 func main() {
 
@@ -17,34 +23,34 @@ func main() {
 		micro.Version("1.0.0"),
 		micro.Flags(
 			cli.BoolFlag{
-				Name: "debug",
+				Name:   "debug",
 				EnvVar: "DEBUG",
-				Usage: "Enable debug mode",
+				Usage:  "Enable debug mode",
 			},
 			cli.StringFlag{
-				Name: "db_host",
+				Name:   "db_host",
 				EnvVar: "DB_HOST",
-				Usage: "The database host",
+				Usage:  "The database host",
 			},
 			cli.StringFlag{
-				Name: "db_port",
+				Name:   "db_port",
 				EnvVar: "DB_PORT",
-				Usage: "The database port",
+				Usage:  "The database port",
 			},
 			cli.StringFlag{
-				Name: "db_username",
+				Name:   "db_username",
 				EnvVar: "DB_USERNAME",
-				Usage: "The database user",
+				Usage:  "The database user",
 			},
 			cli.StringFlag{
-				Name: "db_password",
+				Name:   "db_password",
 				EnvVar: "DB_PASSWORD",
-				Usage: "The database password",
+				Usage:  "The database password",
 			},
 			cli.StringFlag{
-				Name: "db_name",
+				Name:   "db_name",
 				EnvVar: "DB_NAME",
-				Usage: "The database name to use",
+				Usage:  "The database name to use",
 			},
 		),
 	)
@@ -52,7 +58,7 @@ func main() {
 	// Parse command line flags
 	srv.Init(
 		micro.Action(func(c *cli.Context) {
-			if c.Bool("debug")	 {
+			if c.Bool("debug") {
 				log.SetLevel(log.DebugLevel)
 				log.Debug("DEBUG enabled")
 			} else {
@@ -66,6 +72,7 @@ func main() {
 		}),
 	)
 
+	// Database
 	db, err := CreateConnection(dbCfg)
 	if err != nil {
 		log.Fatalf("Error creating database connection: %v", err)
@@ -74,11 +81,25 @@ func main() {
 	defer db.Close()
 	log.Debug("Database connection established")
 
-	db.AutoMigrate(&pb.User{})
-	repo := &UserRepository{db: db}
+	// RabbitMQ
+	broker := srv.Server().Options().Broker
+	if err := broker.Init(rabbitmq.Exchange(ExchangeName)); err != nil {
+		log.Fatalf("Unable to init broker: %v", err)
+		os.Exit(1)
+	}
+	if err := broker.Connect(); err != nil {
+		log.Fatalf("Unable to connect to broker: %v", err)
+		os.Exit(1)
+	}
+	log.Debugf("Connected to RabbitMQ exchange '%s'", ExchangeName)
+
+	pub1 := micro.NewPublisher(userCreatedTopic, srv.Client())
+
+	userStruct := sqlbuilder.NewStruct(new(User))
+	repo := &UserRepository{db: db, userStruct: userStruct}
 	tokenService := &TokenService{repo: repo}
 
-	pb.RegisterUserServiceHandler(srv.Server(), &service{repo, tokenService})
+	pb.RegisterUserServiceHandler(srv.Server(), &service{repo, tokenService, pub1})
 
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

@@ -2,9 +2,22 @@ version: "3.4"
 
 services:
 
+  ### consul #############################################
   consul:
     image: consul
+    ports:
+      - 8500:8500
 
+  ### RabbitMQ ###########################################
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+      - TZ=Europe/Berlin
+    ports:
+      - "5672:5672"
+      - "6060:15672"
 
   ### mail #############################################
   mail:
@@ -27,8 +40,8 @@ services:
       MICRO_REGISTRY: "consul"
       MICRO_REGISTRY_ADDRESS: "consul"
     depends_on:
+      - consul
       - mail
-
 
   ### user ###########################################
   user:
@@ -36,6 +49,8 @@ services:
     environment:
       MICRO_REGISTRY: "consul"
       MICRO_REGISTRY_ADDRESS: "consul"
+      BROKER: "rabbitmq"
+      BROKER_ADDRESS: "amqp://admin:admin@rabbitmq:5672/"
       DEBUG: 1
       DB_HOST: "user-db"
       DB_NAME: "users"
@@ -43,7 +58,19 @@ services:
       DB_PASSWORD:  "secret"
       DB_PORT: "3306"
     depends_on:
+      - consul
+      - rabbitmq
       - user-db
+
+  ### user-cli ########################################
+  user-cli:
+    image: educonn/user-cli:latest
+    environment:
+      MICRO_REGISTRY: "consul"
+      MICRO_REGISTRY_ADDRESS: "consul"
+    depends_on:
+      - consul
+      - user
 
   ### user-db ########################################
   user-db:

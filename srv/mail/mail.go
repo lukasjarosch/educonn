@@ -2,8 +2,9 @@ package main
 
 import (
 	"gopkg.in/gomail.v2"
-	"github.com/lukasjarosch/educonn/srv/mail/proto"
+	user "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	log "github.com/sirupsen/logrus"
+	"fmt"
 )
 
 type  SmtpConfig struct {
@@ -14,21 +15,24 @@ type  SmtpConfig struct {
 	Dialer *gomail.Dialer
 }
 
-func SendMail(config SmtpConfig, req* go_micro_srv_email.EmailRequest) {
+func SendMail(config SmtpConfig, event *user.UserCreatedEvent) {
 
-	log.Debug("SendMail::start")
+	from := "hallo@educonn.de"
+	subject := "Willkommen auf EduConn, %s"
+	message := "Something great is about to happen..."
 
 	mail := gomail.NewMessage()
 
-	mail.SetHeader("From", req.From)
-	mail.SetHeader("To", req.To)
-	mail.SetHeader("Subject", req.Subject)
-	mail.SetBody("text/html", req.Message)
+	mail.SetHeader("From", from)
+	mail.SetHeader("To", event.Email)
+	mail.SetHeader("Subject", fmt.Sprintf(subject, event.FirstName))
+	mail.SetBody("text/html", message)
 
 	if err := config.Dialer.DialAndSend(mail); err != nil {
 		log.Warn(err)
 	}
-	log.Debug("SendMail::end")
+
+	log.Debugf("Sent user-created-email to '%s'", event.Email)
 }
 
 func NewDialer(config* SmtpConfig) {

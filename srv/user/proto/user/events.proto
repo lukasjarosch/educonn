@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package go.micro.srv.user;
+
+message UserCreatedEvent {
+    string Id = 1;
+    string Email = 2;
+    string FirstName = 3;
+    string LastName = 4;
+}

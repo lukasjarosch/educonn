@@ -1,3 +1,5 @@
 .idea
 *.pb.go
 *.micro.go
+mail
+user

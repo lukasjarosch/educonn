@@ -3,17 +3,20 @@ package main
 import (
 	"context"
 	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
+	"github.com/micro/go-micro"
+	log "github.com/sirupsen/logrus"
 )
 
 type service struct {
-	repo Respository
+	repo         Respository
 	tokenService *TokenService
+	pubCreated   micro.Publisher
 }
 
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
 	user, err := srv.repo.Get(req.Id)
 	if err != nil {
-	    return err
+		return err
 	}
 	res.User = user
 	return nil
@@ -22,7 +25,7 @@ func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.UserResponse)
 func (srv *service) GetAll(ctx context.Context, req *pb.Request, res *pb.UserResponse) error {
 	users, err := srv.repo.GetAll()
 	if err != nil {
-	    return err
+		return err
 	}
 	res.Users = users
 	return nil
@@ -31,17 +34,28 @@ func (srv *service) GetAll(ctx context.Context, req *pb.Request, res *pb.UserRes
 func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error {
 	_, err := srv.repo.GetByEmailAndPassword(req)
 	if err != nil {
-	    return err
+		return err
 	}
 	res.Token = "testing123"
 	return nil
 }
 
 func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
-	if err := srv.repo.Create(req); err != nil {
-		return err
+	user, err := srv.repo.Create(req)
+
+	if err != nil {
+		log.Warn(err.Error())
+
+		res.Errors = []*pb.Error{{
+			Code:        500,
+			Description: err.Error(),
+		}}
 	}
-	res.User = req
+
+	res.User = user
+	log.Debugf("Created user '%s'", user.Id)
+	PublishUserCreated(srv.pubCreated, *user)
+
 	return nil
 }
 
