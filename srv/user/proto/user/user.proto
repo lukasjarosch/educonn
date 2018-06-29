@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package go.micro.srv.user;
 
-service UserService {
+service Auth{
     rpc Create(User) returns (UserResponse) {}
     rpc Get(User) returns (UserResponse) {}
     rpc GetAll(Request) returns (UserResponse) {}

@@ -99,7 +99,7 @@ func main() {
 	repo := &UserRepository{db: db, userStruct: userStruct}
 	tokenService := &TokenService{repo: repo}
 
-	pb.RegisterUserServiceHandler(srv.Server(), &service{repo, tokenService, pub1})
+	pb.RegisterAuthHandler(srv.Server(), &service{repo, tokenService, pub1})
 
 	if err := srv.Run(); err != nil {
 		log.Fatal(err)

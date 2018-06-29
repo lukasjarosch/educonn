@@ -36,6 +36,7 @@ func (srv *TokenService) Decode(token string) (*CustomClaims, error) {
 }
 
 func (srv *TokenService) Encode(user *pb.User) (string, error) {
+	user.Password = ""
 	claims := CustomClaims{
 			User: user,
 			StandardClaims: jwt.StandardClaims{

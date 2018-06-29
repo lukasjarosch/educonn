@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 	"errors"
+	"strings"
 )
 
 type service struct {
@@ -14,6 +15,10 @@ type service struct {
 	tokenService *TokenService
 	pubCreated   micro.Publisher
 }
+
+var (
+	errorDuplicateEmail = "Email is already in use!"
+)
 
 // Get a specific user
 func (srv *service) Get(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
@@ -57,6 +62,14 @@ func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error
 // Create a new user and publish an UserCreatedEvent. If the user could not be created, the error will be stuffed in the
 // UserResponse
 func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserResponse) error {
+
+	if req.Email == "" {
+		return errors.New("No email provided")
+	}
+	if req.Password == "" {
+		return errors.New("No password provided")
+	}
+
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 	    return err
@@ -65,12 +78,21 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserRespon
 	user, err := srv.repo.Create(req)
 
 	if err != nil {
-		log.Warn(err.Error())
+		log.Info(err.Error())
 
-		res.Errors = []*pb.Error{{
-			Code:        500,
-			Description: err.Error(),
-		}}
+		if strings.Contains(strings.ToLower(err.Error()), "email") &&
+			strings.Contains(strings.ToLower(err.Error()), "duplicate") {
+				res.Errors = []*pb.Error{{
+					Code: 500,
+					Description: errorDuplicateEmail,
+				}}
+
+		} else {
+			res.Errors = []*pb.Error{{
+				Code:        500,
+				Description: err.Error(),
+			}}
+		}
 	}
 
 	res.User = user

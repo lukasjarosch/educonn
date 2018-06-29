@@ -18,19 +18,6 @@ func PublishUserCreated(publisher micro.Publisher, user pb.User) {
 		FirstName: user.FirstName,
 		LastName: user.LastName,
 	}
-	/*
-	body, err := proto.Marshal(&event)
-	if err != nil {
-		log.Warnf("Could not marshal user message: %v", err)
-	}
-
-	msg := &broker.Message{
-		Header: map[string]string{
-			"user_id": user.Id,
-		},
-		Body: body,
-	}
-	*/
 
 	if err := publisher.Publish(context.Background(), event); err != nil {
 		log.Warnf("Unable to publish message: %v", err)
