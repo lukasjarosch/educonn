@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	client := pb.NewUserServiceClient("go.micro.srv.user", microclient.DefaultClient)
+	client := pb.NewAuthClient("go.micro.srv.user", microclient.DefaultClient)
 
 	firstName := "Lukas"
 	lastName := "Jarosch"
