@@ -2,7 +2,7 @@
 DOCKER_HOST="registry-1.docker.io"
 
 mkdir -p dist
-docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_HOST
+docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_HOSTNAME
 export REPO=$DOCKER_USER/educonn-mail
 export TAG=`if [ "$TRAVIS_BRANCH" == "master" ]; then echo "latest"; else echo $TRAVIS_TAG ; fi`
 echo $REPO:$TAG
