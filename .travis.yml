@@ -15,7 +15,5 @@ script:
   - make travis
 
 after_success:
-  - mkdir dist
-  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-  - export REPO=$DOCKER_USER/
+  - make travis-deploy
 
