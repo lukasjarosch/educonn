@@ -8,8 +8,10 @@ go:
 
 before_install:
   - bash bin/install-protobuf.sh
+  - go get -u github.com/golang/dep/cmd/dep
   - go get -u github.com/golang/protobuf/protoc-gen-go
   - go get -u github.com/micro/protoc-gen-micro
+  - dep ensure -v
 script:
   - make travis
 
