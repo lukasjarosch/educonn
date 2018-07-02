@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-DOCKER_HOST="registry-1.docker.io"
-
 mkdir -p dist
 docker login -u $DOCKER_USER -p $DOCKER_PASSWORD $DOCKER_HOSTNAME
 export REPO=$DOCKER_USER/educonn-mail
