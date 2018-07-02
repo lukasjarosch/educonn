@@ -5,7 +5,8 @@ build:
 
 travis:
 	$(HOME)/protobuf/bin/protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/lukasjarosch/educonn/srv/mail --micro_out=.  proto/mail.proto
-	docker build -t educonn/mail -f Dockerfile-deploy .
+	dep ensure -v
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o mail .
 
 clean:
 	rm mail
