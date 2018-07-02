@@ -10,7 +10,7 @@ go:
 
 before_install:
   - bash bin/install-protobuf.sh
-  - go get -vu github.com/golang/protobuf/protoc-gen-go
+  - go get -u github.com/golang/protobuf/protoc-gen-go
 script:
   - make travis
 
