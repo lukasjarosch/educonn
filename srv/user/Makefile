@@ -8,6 +8,9 @@ travis:
 	dep ensure -v
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o user .
 
+travis-deploy:
+	../../bin/deploy-travis.sh
+
 clean:
 	rm user
 
