@@ -3,8 +3,8 @@ build:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o mail .
 	docker build -t educonn/mail-dev -f Dockerfile .
 
-deploy:
-	$(HOME)/protobuf/bin/protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/lukasjarosch/educonn/srv/mail --micro_out=.  proto/mail.proto
+travis:
+	"$HOME/protobuf/bin/protoc" -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/lukasjarosch/educonn/srv/mail --micro_out=.  proto/mail.proto
 	docker build -t educonn/mail -f Dockerfile-deploy .
 
 clean:

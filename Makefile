@@ -1,4 +1,4 @@
 travis:
-	cd srv/mail/ && $(MAKE) deploy && cd ../..
-	cd srv/user/ && $(MAKE) deploy && cd ../..
+	cd srv/mail/ && $(MAKE) traivs && cd ../..
+	cd srv/user/ && $(MAKE) traivs && cd ../..
 
