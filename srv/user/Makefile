@@ -4,7 +4,7 @@ build:
 	docker build -t educonn/user-dev -f Dockerfile .
 
 deploy:
-	$HOME/protbuf/bin/protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/lukasjarosch/educonn/srv/user --micro_out=.  proto/user/*.proto
+	$(HOME)/protobuf/bin/protoc -I. --go_out=plugins=micro:$(GOPATH)/src/github.com/lukasjarosch/educonn/srv/user --micro_out=.  proto/user/*.proto
 	docker build -t educonn/user -f Dockerfile-deploy .
 
 clean:
