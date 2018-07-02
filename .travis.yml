@@ -1,0 +1,13 @@
+sudo: required
+
+language: go
+
+services:
+  - docker
+
+go:
+  - 1.10.3
+
+script:
+  - make travis
+

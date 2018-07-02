@@ -117,7 +117,7 @@ func (repo *UserRepository) GetByEmail(user *pb.User) (*pb.User, error) {
 }
 
 func (repo *UserRepository) Create(user *pb.User) (*pb.User, error) {
-	uuid, _ := uuid.NewV4()
+	uuid := uuid.NewV4()
 	u := User{
 		Id:        uuid.String(),
 		FirstName: user.FirstName,
