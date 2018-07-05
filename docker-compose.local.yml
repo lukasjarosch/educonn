@@ -46,7 +46,7 @@ services:
 
   ### user ###########################################
   user:
-    image: educonn/user:latest
+    image: educonn/user-dev:latest
     environment:
       MICRO_REGISTRY: "consul"
       MICRO_REGISTRY_ADDRESS: "consul"

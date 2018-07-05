@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
+	"errors"
 	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	"github.com/micro/go-micro"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"errors"
-	"strings"
 )
 
 type service struct {
@@ -17,7 +16,7 @@ type service struct {
 }
 
 var (
-	errorDuplicateEmail = "Email is already in use!"
+	errorUserExists = "User already exists (duplicate email)"
 )
 
 // Get a specific user
@@ -52,7 +51,7 @@ func (srv *service) Auth(ctx context.Context, req *pb.User, res *pb.Token) error
 
 	token, err := srv.tokenService.Encode(user)
 	if err != nil {
-	    return err
+		return err
 	}
 
 	res.Token = token
@@ -72,27 +71,18 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserRespon
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-	    return err
+		return err
 	}
 	req.Password = string(hashedPassword)
 	user, err := srv.repo.Create(req)
-
 	if err != nil {
-		log.Info(err.Error())
 
-		if strings.Contains(strings.ToLower(err.Error()), "email") &&
-			strings.Contains(strings.ToLower(err.Error()), "duplicate") {
-				res.Errors = []*pb.Error{{
-					Code: 500,
-					Description: errorDuplicateEmail,
-				}}
+		res.Errors = []*pb.Error{{
+			Code:        500,
+			Description: err.Error(),
+		}}
 
-		} else {
-			res.Errors = []*pb.Error{{
-				Code:        500,
-				Description: err.Error(),
-			}}
-		}
+		return err
 	}
 
 	res.User = user
@@ -105,7 +95,7 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserRespon
 func (srv *service) ValidateToken(ctx context.Context, req *pb.Token, res *pb.Token) error {
 	claims, err := srv.tokenService.Decode(req.Token)
 	if err != nil {
-	    return err
+		return err
 	}
 
 	if claims.User.Id == "" {

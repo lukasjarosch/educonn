@@ -2,14 +2,17 @@ package main
 
 import (
 	pb "github.com/lukasjarosch/educonn/srv/user/proto/user"
-	microclient "github.com/micro/go-micro/client"
+	"os"
+	"github.com/micro/go-micro"
 	"context"
 	"github.com/prometheus/common/log"
-	"os"
 )
 
 func main() {
-	client := pb.NewAuthClient("go.micro.srv.user", microclient.DefaultClient)
+	service :=  micro.NewService(micro.Name("greeter.client"))
+	service.Init()
+
+	client := pb.NewAuthClient("go.micro.srv.user", service.Client())
 
 	firstName := "Lukas"
 	lastName := "Jarosch"

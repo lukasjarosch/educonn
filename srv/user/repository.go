@@ -8,6 +8,7 @@ import (
 	"github.com/satori/go.uuid"
 	"time"
 	"github.com/go-sql-driver/mysql"
+	"github.com/pkg/errors"
 )
 
 type Respository interface {
@@ -138,6 +139,15 @@ func (repo *UserRepository) Create(user *pb.User) (*pb.User, error) {
 	log.Debugf("Executing SQL: %v", sql)
 
 	_, err := repo.db.Exec(sql, args...)
+
+	mysqlErr, ok := err.(*mysql.MySQLError)
+	if !ok {
+		log.Error(err)
+	}
+
+	if mysqlErr.Number == MYSQL_KEY_EXISTS {
+		err = errors.New("the email address is already taken by another user")
+	}
 
 	user.Id = u.Id
 

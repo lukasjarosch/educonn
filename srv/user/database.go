@@ -8,6 +8,8 @@ import (
 	"database/sql"
 )
 
+const MYSQL_KEY_EXISTS  = 1062
+
 type DbConfig struct {
 	Host string
 	Port string
