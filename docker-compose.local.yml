@@ -73,3 +73,10 @@ services:
       MYSQL_ROOT_PASSWORD: "superSecret"
     ports:
       - 3306:3306
+
+  ### course-db ########################################
+  course-db:
+    image: mongo:latest
+    command: mongod
+    ports:
+      - 27017:27017

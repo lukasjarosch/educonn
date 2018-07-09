@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package go.micro.srv.course;
+
+service Course {
+   rpc Create(CourseEntity) returns (CourseResponse) {}
+   rpc Get(CourseEntity) returns (CourseResponse) {}
+   rpc GetAll(Request) returns (CourseResponse) {}
+}
+
+message CourseEntity {
+    string id = 1;
+    string title = 2;
+    string description = 3;
+    repeated string topics = 4;
+    string type = 5;
+}
+
+message Request {}
+
+message CourseResponse {
+    CourseEntity course = 1;
+    repeated CourseEntity courses = 2;
+    repeated Error errors = 3;
+}
+
+message Error {
+    int32 code = 1;
+    string message = 2;
+}
