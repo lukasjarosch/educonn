@@ -59,9 +59,11 @@ func (s *DB) FindById(id string) (Course, error) {
 	course := Course{}
 
 	err := sess.DB(s.DbName).C(COLLECTION).FindId(bson.ObjectIdHex(id)).One(&course)
+	log.Debug(course)
 	if err != nil {
-	    return course, err
+	    return Course{}, err
 	}
+
 	return course, nil
 }
 

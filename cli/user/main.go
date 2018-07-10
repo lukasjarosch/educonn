@@ -12,7 +12,7 @@ func main() {
 	service :=  micro.NewService(micro.Name("greeter.client"))
 	service.Init()
 
-	client := pb.NewAuthClient("go.micro.srv.user", service.Client())
+	client := pb.NewAuthClient("educonn.user", service.Client())
 
 	firstName := "Lukas"
 	lastName := "Jarosch"

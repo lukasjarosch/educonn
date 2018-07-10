@@ -2,7 +2,7 @@
 // source: proto/course/course.proto
 
 /*
-Package go_micro_srv_course is a generated protocol buffer package.
+Package educonn_course is a generated protocol buffer package.
 
 It is generated from these files:
 	proto/course/course.proto
@@ -13,7 +13,7 @@ It has these top-level messages:
 	CourseResponse
 	Error
 */
-package go_micro_srv_course
+package educonn_course
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -59,7 +59,7 @@ func NewCourseClient(serviceName string, c client.Client) CourseClient {
 		c = client.NewClient()
 	}
 	if len(serviceName) == 0 {
-		serviceName = "go.micro.srv.course"
+		serviceName = "educonn.course"
 	}
 	return &courseClient{
 		c:           c,

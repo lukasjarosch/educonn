@@ -19,19 +19,22 @@ services:
       - "5672:5672"
       - "6060:15672"
 
+
   ### api ##############################################
   api:
     image: microhq/micro
-    command: api --handler=rpc --address=:8080 --namespace=go.micro.srv
-    ports:
-      - "8080:8080"
+    command: api --handler=rpc --address=:8080 --namespace=educonn
     environment:
       MICRO_REGISTRY: "consul"
       MICRO_REGISTRY_ADDRESS: "consul"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - consul
 
   ### mail #############################################
   mail:
-    image: educonn/mail:latest
+    image: educonn/mail-dev:latest
     environment:
       DEBUG: 1
       MICRO_REGISTRY: "consul"
@@ -62,6 +65,22 @@ services:
       - consul
       - rabbitmq
       - user-db
+
+  ### course #########################################
+  course:
+    image: educonn/course-dev:latest
+    environment:
+      MICRO_REGISTRY: "consul"
+      MICRO_REGISTRY_ADDRESS: "consul"
+      DEBUG: 1
+      DB_HOST: "course-db"
+      DB_PORT: "27017"
+      DB_NAME: "courses"
+      DB_USER: "courses"
+      DB_PASS: "secret"
+    depends_on:
+      - consul
+      - course-db
 
   ### user-db ########################################
   user-db:

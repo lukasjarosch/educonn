@@ -25,7 +25,7 @@ func main() {
 
 	service.Server().Handle(
 		service.Server().NewHandler(
-			&User{Client: user.NewUserServiceClient("go.micro.srv.user", service.Client())},
+			&User{Client: user.NewUserServiceClient("educonn.user", service.Client())},
 		),
 	)
 

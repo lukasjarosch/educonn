@@ -2,7 +2,7 @@
 // source: proto/mail.proto
 
 /*
-Package go_micro_srv_email is a generated protocol buffer package.
+Package educonn_mail is a generated protocol buffer package.
 
 It is generated from these files:
 	proto/mail.proto
@@ -11,7 +11,7 @@ It has these top-level messages:
 	EmailRequest
 	Response
 */
-package go_micro_srv_email
+package educonn_mail
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -55,7 +55,7 @@ func NewEmailServiceClient(serviceName string, c client.Client) EmailServiceClie
 		c = client.NewClient()
 	}
 	if len(serviceName) == 0 {
-		serviceName = "go.micro.srv.email"
+		serviceName = "educonn.mail"
 	}
 	return &emailServiceClient{
 		c:           c,

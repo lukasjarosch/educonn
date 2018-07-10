@@ -43,7 +43,7 @@ func main() {
 	smtpConfig := SmtpConfig{}
 
 	srv := micro.NewService(
-		micro.Name("go.micro.srv.mail"),
+		micro.Name("educonn.mail"),
 		micro.Version("1.0.0"),
 		micro.Flags(
 			cli.StringFlag{

@@ -1,27 +1,36 @@
 package main
 
 import (
+	"context"
+	"errors"
+	"os"
+
+	"github.com/lukasjarosch/educonn/srv/course/database"
 	"github.com/lukasjarosch/educonn/srv/course/handler"
 	course "github.com/lukasjarosch/educonn/srv/course/proto/course"
+	auth "github.com/lukasjarosch/educonn/srv/user/proto/user"
 	"github.com/micro/cli"
-	log "github.com/sirupsen/logrus"
 	"github.com/micro/go-micro"
-	"github.com/lukasjarosch/educonn/srv/course/database"
+	"github.com/micro/go-micro/metadata"
+	"github.com/micro/go-micro/server"
+	log "github.com/sirupsen/logrus"
 )
 
-const ServiceName = "go.micro.srv.course"
+const ServiceName = "educonn.course"
 const ServiceVersion = "1.0.0"
 
 var (
+	service micro.Service
+
 	debugFlag = cli.BoolFlag{
 		Name:   "debug",
 		EnvVar: "DEBUG",
 		Usage:  "Enable debug mode",
 	}
 	dbHostFlag = cli.StringFlag{
-			Name:   "db_host",
-			EnvVar: "DB_HOST",
-			Usage:  "The database host",
+		Name:   "db_host",
+		EnvVar: "DB_HOST",
+		Usage:  "The database host",
 	}
 	dbPortFlag = cli.StringFlag{
 		Name:   "db_port",
@@ -50,7 +59,7 @@ func main() {
 	var dbCfg database.DbConfig
 
 	// New Service
-	service := micro.NewService(
+	service = micro.NewService(
 		micro.Name(ServiceName),
 		micro.Version(ServiceVersion),
 		micro.Flags(
@@ -61,6 +70,7 @@ func main() {
 			dbPassFlag,
 			dbNameFlag,
 		),
+		micro.WrapHandler(AuthWrapper),
 	)
 
 	// Initialise service
@@ -80,21 +90,54 @@ func main() {
 		}),
 	)
 
+	log.Debugf("Database %s", dbCfg.Database)
+
 	// Setup database
 	db, err := database.NewDB(&dbCfg)
 	if err != nil {
-	    log.Errorf("Unable to connect to storage: %v", err)
-	    return
+		log.Errorf("Unable to connect to storage: %v", err)
+		return
 	}
 
 	// Register Handler
 	course.RegisterCourseHandler(service.Server(), &handler.Service{DB: db})
 
 	// Register Struct as Subscriber
-	//micro.RegisterSubscriber("topic.go.micro.srv.course", service.Server(), new(subscriber.Example))
+	//micro.RegisterSubscriber("topic.educonn.course", service.Server(), new(subscriber.Example))
 
 	// Run service
 	if err := service.Run(); err != nil {
 		log.Fatal(err)
+	}
+}
+
+func AuthWrapper(fn server.HandlerFunc) server.HandlerFunc {
+	return func(ctx context.Context, req server.Request, res interface{}) error {
+		if os.Getenv("DISABLE_AUTH") == "true" {
+			return fn(ctx, req, res)
+		}
+
+		meta, ok := metadata.FromContext(ctx)
+		if !ok {
+			return errors.New( "no auth metadata found in request")
+		}
+
+		if meta["Token"] == "" {
+			return errors.New("no token header found in request")
+		}
+
+		token := meta["Token"]
+		log.Debugf("authenticating with token %s", token)
+
+		authClient := auth.NewAuthClient("educonn.user", service.Client())
+		_, err := authClient.ValidateToken(ctx, &auth.Token{
+			Token: token,
+		})
+		if err != nil {
+			return err
+		}
+
+		err = fn(ctx, req, res)
+		return err
 	}
 }

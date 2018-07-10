@@ -13,7 +13,7 @@ import (
 func main() {
 	log.SetLevel(log.DebugLevel)
 
-	client := pb.NewEmailServiceClient("go.micro.srv.mail", microclient.DefaultClient)
+	client := pb.NewEmailServiceClient("educonn.mail", microclient.DefaultClient)
 
 	service := micro.NewService(
 		micro.Name("go.micro.cli.mail"),

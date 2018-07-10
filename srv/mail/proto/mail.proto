@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package go.micro.srv.email;
+package educonn.mail;
 
 service EmailService {
     rpc SendEmail (EmailRequest) returns (Response);

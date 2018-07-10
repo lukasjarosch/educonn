@@ -1,6 +1,6 @@
 # Course Srv
 
-This is the Course service with fqdn go.micro.srv.course.
+This is the Course service with fqdn educonn.course.
 
 ## Getting Started
 

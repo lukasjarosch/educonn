@@ -1,3 +1,9 @@
-FROM alpine:3.2
-ADD course-srv /course-srv
-ENTRYPOINT [ "/course-srv" ]
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+RUN mkdir /app
+WORKDIR /app
+ADD course .
+ENTRYPOINT ["./course"]
+CMD ["./course"]
+

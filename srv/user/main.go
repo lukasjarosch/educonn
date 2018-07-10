@@ -14,12 +14,14 @@ import (
 
 const ExchangeName = "user"
 
+var srv micro.Service
+
 func main() {
 
 	var dbCfg DbConfig
 
 	srv := micro.NewService(
-		micro.Name("go.micro.srv.user"),
+		micro.Name("educonn.user"),
 		micro.Version("1.0.0"),
 		micro.Flags(
 			cli.BoolFlag{
@@ -105,3 +107,4 @@ func main() {
 		log.Fatal(err)
 	}
 }
+

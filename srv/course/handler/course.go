@@ -6,6 +6,7 @@ import (
 	pb "github.com/lukasjarosch/educonn/srv/course/proto/course"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/mgo.v2/bson"
+	"errors"
 )
 
 type Service struct {
@@ -42,6 +43,42 @@ func (srv *Service) Create(ctx context.Context, req *pb.CourseEntity, res *pb.Co
 
 // Get an existing course
 func (srv *Service) Get(ctx context.Context, req *pb.CourseEntity, res *pb.CourseResponse) error {
+
+	if req.Id == "" {
+		log.Debug("missing id")
+		return errors.New("missing id")
+	}
+
+	course, err := srv.DB.FindById(req.Id)
+	if err != nil {
+		error := &pb.Error{
+			Code:    404,
+			Message: err.Error(),
+		}
+		res.Errors = append(res.Errors, error)
+		log.Debugf("%s: %s", req.Id, err.Error())
+		return err
+	}
+
+	log.Debugf("%s: %s", req.Id, course.Title)
+
+	if course.ID == "" {
+		error := &pb.Error{
+			Code:    404,
+			Message: err.Error(),
+		}
+		res.Errors = append(res.Errors, error)
+		return err
+	}
+
+	res.Course = &pb.CourseEntity{
+		Id:          course.ID.Hex(),
+		Title:       course.Title,
+		Description: course.Description,
+		Topics:      course.Topics,
+		Type:        course.Type,
+	}
+
 	return nil
 }
 
@@ -64,6 +101,7 @@ func (srv *Service) GetAll(ctx context.Context, req *pb.Request, res *pb.CourseR
 			Id:          course.ID.Hex(),
 			Title:       course.Title,
 			Description: course.Description,
+			Topics:      course.Topics,
 			Type:        course.Type,
 		})
 	}

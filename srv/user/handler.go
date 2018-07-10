@@ -11,7 +11,7 @@ import (
 
 type service struct {
 	repo         Respository
-	tokenService *TokenService
+	tokenService Authable
 	pubCreated   micro.Publisher
 }
 
@@ -67,6 +67,12 @@ func (srv *service) Create(ctx context.Context, req *pb.User, res *pb.UserRespon
 	}
 	if req.Password == "" {
 		return errors.New("No password provided")
+	}
+	if req.FirstName == "" {
+		return errors.New("No first_name provided")
+	}
+	if req.LastName == "" {
+		return errors.New("No last_name provided")
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
