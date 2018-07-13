@@ -6,6 +6,8 @@ service Course {
    rpc Create(CourseEntity) returns (CourseResponse) {}
    rpc Get(CourseEntity) returns (CourseResponse) {}
    rpc GetAll(Request) returns (CourseResponse) {}
+   rpc AddModule(AddModuleRequest) returns (AddModuleResponse) {}
+   rpc AddLesson (AddLessonRequest) returns (AddLessonResponse) {}
 }
 
 message CourseEntity {
@@ -14,6 +16,43 @@ message CourseEntity {
     string description = 3;
     repeated string topics = 4;
     string type = 5;
+    repeated Module modules = 6;
+}
+
+message AddModuleRequest {
+    string courseId = 1;
+    Module module = 2;
+}
+
+message AddModuleResponse {
+    string moduleId = 1;
+    repeated Error errors = 2;
+}
+
+message Module {
+    string id = 1;
+    string name = 2;
+    string order = 3;
+    string description = 4;
+    repeated Lesson lessons = 5;
+}
+
+message AddLessonRequest {
+    string courseId = 1;
+    string moduleId = 2;
+    Lesson lesson = 3;
+}
+
+message AddLessonResponse {
+    string lessonId = 1;
+    repeated Error errors = 2;
+}
+
+message Lesson {
+    string id = 1;
+    string name = 3;
+    string order = 4;
+    string videoId = 5;
 }
 
 message Request {}

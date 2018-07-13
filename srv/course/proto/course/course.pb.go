@@ -19,21 +19,22 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion2 // please upgrade the proto package
 
 type CourseEntity struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title                string   `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Description          string   `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Topics               []string `protobuf:"bytes,4,rep,name=topics,proto3" json:"topics,omitempty"`
-	Type                 string   `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Id                   string    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Title                string    `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Description          string    `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Topics               []string  `protobuf:"bytes,4,rep,name=topics,proto3" json:"topics,omitempty"`
+	Type                 string    `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
+	Modules              []*Module `protobuf:"bytes,6,rep,name=modules,proto3" json:"modules,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *CourseEntity) Reset()         { *m = CourseEntity{} }
 func (m *CourseEntity) String() string { return proto.CompactTextString(m) }
 func (*CourseEntity) ProtoMessage()    {}
 func (*CourseEntity) Descriptor() ([]byte, []int) {
-	return fileDescriptor_course_7d10d6e961f07463, []int{0}
+	return fileDescriptor_course_1674e2f1a4e76330, []int{0}
 }
 func (m *CourseEntity) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CourseEntity.Unmarshal(m, b)
@@ -88,6 +89,337 @@ func (m *CourseEntity) GetType() string {
 	return ""
 }
 
+func (m *CourseEntity) GetModules() []*Module {
+	if m != nil {
+		return m.Modules
+	}
+	return nil
+}
+
+type AddModuleRequest struct {
+	CourseId             string   `protobuf:"bytes,1,opt,name=courseId,proto3" json:"courseId,omitempty"`
+	Module               *Module  `protobuf:"bytes,2,opt,name=module,proto3" json:"module,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddModuleRequest) Reset()         { *m = AddModuleRequest{} }
+func (m *AddModuleRequest) String() string { return proto.CompactTextString(m) }
+func (*AddModuleRequest) ProtoMessage()    {}
+func (*AddModuleRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_course_1674e2f1a4e76330, []int{1}
+}
+func (m *AddModuleRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddModuleRequest.Unmarshal(m, b)
+}
+func (m *AddModuleRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddModuleRequest.Marshal(b, m, deterministic)
+}
+func (dst *AddModuleRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddModuleRequest.Merge(dst, src)
+}
+func (m *AddModuleRequest) XXX_Size() int {
+	return xxx_messageInfo_AddModuleRequest.Size(m)
+}
+func (m *AddModuleRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddModuleRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddModuleRequest proto.InternalMessageInfo
+
+func (m *AddModuleRequest) GetCourseId() string {
+	if m != nil {
+		return m.CourseId
+	}
+	return ""
+}
+
+func (m *AddModuleRequest) GetModule() *Module {
+	if m != nil {
+		return m.Module
+	}
+	return nil
+}
+
+type AddModuleResponse struct {
+	ModuleId             string   `protobuf:"bytes,1,opt,name=moduleId,proto3" json:"moduleId,omitempty"`
+	Errors               []*Error `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddModuleResponse) Reset()         { *m = AddModuleResponse{} }
+func (m *AddModuleResponse) String() string { return proto.CompactTextString(m) }
+func (*AddModuleResponse) ProtoMessage()    {}
+func (*AddModuleResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_course_1674e2f1a4e76330, []int{2}
+}
+func (m *AddModuleResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddModuleResponse.Unmarshal(m, b)
+}
+func (m *AddModuleResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddModuleResponse.Marshal(b, m, deterministic)
+}
+func (dst *AddModuleResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddModuleResponse.Merge(dst, src)
+}
+func (m *AddModuleResponse) XXX_Size() int {
+	return xxx_messageInfo_AddModuleResponse.Size(m)
+}
+func (m *AddModuleResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddModuleResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddModuleResponse proto.InternalMessageInfo
+
+func (m *AddModuleResponse) GetModuleId() string {
+	if m != nil {
+		return m.ModuleId
+	}
+	return ""
+}
+
+func (m *AddModuleResponse) GetErrors() []*Error {
+	if m != nil {
+		return m.Errors
+	}
+	return nil
+}
+
+type Module struct {
+	Id                   string    `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string    `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Order                string    `protobuf:"bytes,3,opt,name=order,proto3" json:"order,omitempty"`
+	Description          string    `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Lessons              []*Lesson `protobuf:"bytes,5,rep,name=lessons,proto3" json:"lessons,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *Module) Reset()         { *m = Module{} }
+func (m *Module) String() string { return proto.CompactTextString(m) }
+func (*Module) ProtoMessage()    {}
+func (*Module) Descriptor() ([]byte, []int) {
+	return fileDescriptor_course_1674e2f1a4e76330, []int{3}
+}
+func (m *Module) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Module.Unmarshal(m, b)
+}
+func (m *Module) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Module.Marshal(b, m, deterministic)
+}
+func (dst *Module) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Module.Merge(dst, src)
+}
+func (m *Module) XXX_Size() int {
+	return xxx_messageInfo_Module.Size(m)
+}
+func (m *Module) XXX_DiscardUnknown() {
+	xxx_messageInfo_Module.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Module proto.InternalMessageInfo
+
+func (m *Module) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Module) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Module) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *Module) GetDescription() string {
+	if m != nil {
+		return m.Description
+	}
+	return ""
+}
+
+func (m *Module) GetLessons() []*Lesson {
+	if m != nil {
+		return m.Lessons
+	}
+	return nil
+}
+
+type AddLessonRequest struct {
+	CourseId             string   `protobuf:"bytes,1,opt,name=courseId,proto3" json:"courseId,omitempty"`
+	ModuleId             string   `protobuf:"bytes,2,opt,name=moduleId,proto3" json:"moduleId,omitempty"`
+	Lesson               *Lesson  `protobuf:"bytes,3,opt,name=lesson,proto3" json:"lesson,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddLessonRequest) Reset()         { *m = AddLessonRequest{} }
+func (m *AddLessonRequest) String() string { return proto.CompactTextString(m) }
+func (*AddLessonRequest) ProtoMessage()    {}
+func (*AddLessonRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_course_1674e2f1a4e76330, []int{4}
+}
+func (m *AddLessonRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddLessonRequest.Unmarshal(m, b)
+}
+func (m *AddLessonRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddLessonRequest.Marshal(b, m, deterministic)
+}
+func (dst *AddLessonRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddLessonRequest.Merge(dst, src)
+}
+func (m *AddLessonRequest) XXX_Size() int {
+	return xxx_messageInfo_AddLessonRequest.Size(m)
+}
+func (m *AddLessonRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddLessonRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddLessonRequest proto.InternalMessageInfo
+
+func (m *AddLessonRequest) GetCourseId() string {
+	if m != nil {
+		return m.CourseId
+	}
+	return ""
+}
+
+func (m *AddLessonRequest) GetModuleId() string {
+	if m != nil {
+		return m.ModuleId
+	}
+	return ""
+}
+
+func (m *AddLessonRequest) GetLesson() *Lesson {
+	if m != nil {
+		return m.Lesson
+	}
+	return nil
+}
+
+type AddLessonResponse struct {
+	LessonId             string   `protobuf:"bytes,1,opt,name=lessonId,proto3" json:"lessonId,omitempty"`
+	Errors               []*Error `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *AddLessonResponse) Reset()         { *m = AddLessonResponse{} }
+func (m *AddLessonResponse) String() string { return proto.CompactTextString(m) }
+func (*AddLessonResponse) ProtoMessage()    {}
+func (*AddLessonResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_course_1674e2f1a4e76330, []int{5}
+}
+func (m *AddLessonResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddLessonResponse.Unmarshal(m, b)
+}
+func (m *AddLessonResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddLessonResponse.Marshal(b, m, deterministic)
+}
+func (dst *AddLessonResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddLessonResponse.Merge(dst, src)
+}
+func (m *AddLessonResponse) XXX_Size() int {
+	return xxx_messageInfo_AddLessonResponse.Size(m)
+}
+func (m *AddLessonResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddLessonResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AddLessonResponse proto.InternalMessageInfo
+
+func (m *AddLessonResponse) GetLessonId() string {
+	if m != nil {
+		return m.LessonId
+	}
+	return ""
+}
+
+func (m *AddLessonResponse) GetErrors() []*Error {
+	if m != nil {
+		return m.Errors
+	}
+	return nil
+}
+
+type Lesson struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                 string   `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Order                string   `protobuf:"bytes,4,opt,name=order,proto3" json:"order,omitempty"`
+	VideoId              string   `protobuf:"bytes,5,opt,name=videoId,proto3" json:"videoId,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Lesson) Reset()         { *m = Lesson{} }
+func (m *Lesson) String() string { return proto.CompactTextString(m) }
+func (*Lesson) ProtoMessage()    {}
+func (*Lesson) Descriptor() ([]byte, []int) {
+	return fileDescriptor_course_1674e2f1a4e76330, []int{6}
+}
+func (m *Lesson) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_Lesson.Unmarshal(m, b)
+}
+func (m *Lesson) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_Lesson.Marshal(b, m, deterministic)
+}
+func (dst *Lesson) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Lesson.Merge(dst, src)
+}
+func (m *Lesson) XXX_Size() int {
+	return xxx_messageInfo_Lesson.Size(m)
+}
+func (m *Lesson) XXX_DiscardUnknown() {
+	xxx_messageInfo_Lesson.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Lesson proto.InternalMessageInfo
+
+func (m *Lesson) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
+func (m *Lesson) GetName() string {
+	if m != nil {
+		return m.Name
+	}
+	return ""
+}
+
+func (m *Lesson) GetOrder() string {
+	if m != nil {
+		return m.Order
+	}
+	return ""
+}
+
+func (m *Lesson) GetVideoId() string {
+	if m != nil {
+		return m.VideoId
+	}
+	return ""
+}
+
 type Request struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -98,7 +430,7 @@ func (m *Request) Reset()         { *m = Request{} }
 func (m *Request) String() string { return proto.CompactTextString(m) }
 func (*Request) ProtoMessage()    {}
 func (*Request) Descriptor() ([]byte, []int) {
-	return fileDescriptor_course_7d10d6e961f07463, []int{1}
+	return fileDescriptor_course_1674e2f1a4e76330, []int{7}
 }
 func (m *Request) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Request.Unmarshal(m, b)
@@ -131,7 +463,7 @@ func (m *CourseResponse) Reset()         { *m = CourseResponse{} }
 func (m *CourseResponse) String() string { return proto.CompactTextString(m) }
 func (*CourseResponse) ProtoMessage()    {}
 func (*CourseResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_course_7d10d6e961f07463, []int{2}
+	return fileDescriptor_course_1674e2f1a4e76330, []int{8}
 }
 func (m *CourseResponse) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_CourseResponse.Unmarshal(m, b)
@@ -184,7 +516,7 @@ func (m *Error) Reset()         { *m = Error{} }
 func (m *Error) String() string { return proto.CompactTextString(m) }
 func (*Error) ProtoMessage()    {}
 func (*Error) Descriptor() ([]byte, []int) {
-	return fileDescriptor_course_7d10d6e961f07463, []int{3}
+	return fileDescriptor_course_1674e2f1a4e76330, []int{9}
 }
 func (m *Error) XXX_Unmarshal(b []byte) error {
 	return xxx_messageInfo_Error.Unmarshal(m, b)
@@ -220,33 +552,52 @@ func (m *Error) GetMessage() string {
 
 func init() {
 	proto.RegisterType((*CourseEntity)(nil), "educonn.course.CourseEntity")
+	proto.RegisterType((*AddModuleRequest)(nil), "educonn.course.AddModuleRequest")
+	proto.RegisterType((*AddModuleResponse)(nil), "educonn.course.AddModuleResponse")
+	proto.RegisterType((*Module)(nil), "educonn.course.Module")
+	proto.RegisterType((*AddLessonRequest)(nil), "educonn.course.AddLessonRequest")
+	proto.RegisterType((*AddLessonResponse)(nil), "educonn.course.AddLessonResponse")
+	proto.RegisterType((*Lesson)(nil), "educonn.course.Lesson")
 	proto.RegisterType((*Request)(nil), "educonn.course.Request")
 	proto.RegisterType((*CourseResponse)(nil), "educonn.course.CourseResponse")
 	proto.RegisterType((*Error)(nil), "educonn.course.Error")
 }
 
-func init() { proto.RegisterFile("proto/course/course.proto", fileDescriptor_course_7d10d6e961f07463) }
+func init() { proto.RegisterFile("proto/course/course.proto", fileDescriptor_course_1674e2f1a4e76330) }
 
-var fileDescriptor_course_7d10d6e961f07463 = []byte{
-	// 311 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x52, 0x4d, 0x4b, 0xc3, 0x40,
-	0x10, 0x35, 0x49, 0xb3, 0xa5, 0x53, 0xe9, 0x61, 0xf0, 0x63, 0x15, 0x91, 0x90, 0x53, 0x2f, 0x46,
-	0xa8, 0x1f, 0x77, 0x29, 0xa5, 0x9e, 0xf7, 0x1f, 0xd4, 0x64, 0x90, 0x85, 0x9a, 0x8d, 0xbb, 0x93,
-	0x43, 0xaf, 0xfe, 0x1f, 0xff, 0x92, 0xbf, 0x45, 0xba, 0x9b, 0x40, 0x2d, 0x62, 0x0f, 0x9e, 0xf2,
-	0xe6, 0xcd, 0x7b, 0x93, 0x37, 0x93, 0xc0, 0x45, 0x63, 0x0d, 0x9b, 0xdb, 0xd2, 0xb4, 0xd6, 0x51,
-	0xf7, 0x28, 0x3c, 0x87, 0x13, 0xaa, 0xda, 0xd2, 0xd4, 0x75, 0x11, 0xd8, 0xfc, 0x23, 0x82, 0xe3,
-	0xb9, 0x87, 0x8b, 0x9a, 0x35, 0x6f, 0x70, 0x02, 0xb1, 0xae, 0x64, 0x94, 0x45, 0xd3, 0x91, 0x8a,
-	0x75, 0x85, 0x27, 0x90, 0xb2, 0xe6, 0x35, 0xc9, 0xd8, 0x53, 0xa1, 0xc0, 0x0c, 0xc6, 0x15, 0xb9,
-	0xd2, 0xea, 0x86, 0xb5, 0xa9, 0x65, 0xe2, 0x7b, 0xbb, 0x14, 0x9e, 0x81, 0x60, 0xd3, 0xe8, 0xd2,
-	0xc9, 0x41, 0x96, 0x4c, 0x47, 0xaa, 0xab, 0x10, 0x61, 0xc0, 0x9b, 0x86, 0x64, 0xea, 0x2d, 0x1e,
-	0xe7, 0x23, 0x18, 0x2a, 0x7a, 0x6f, 0xc9, 0x71, 0xfe, 0x19, 0xc1, 0x24, 0xe4, 0x51, 0xe4, 0x1a,
-	0x53, 0x3b, 0xc2, 0x7b, 0x10, 0x21, 0xac, 0x4f, 0x35, 0x9e, 0x5d, 0x15, 0x3f, 0x77, 0x28, 0x76,
-	0xf3, 0xab, 0x4e, 0x8b, 0x8f, 0x30, 0x0c, 0xc8, 0xc9, 0x38, 0x4b, 0x0e, 0xda, 0x7a, 0x31, 0xde,
-	0x80, 0x20, 0x6b, 0x8d, 0x75, 0x32, 0xf1, 0xb6, 0xd3, 0x7d, 0xdb, 0x62, 0xdb, 0x55, 0x9d, 0x28,
-	0x7f, 0x80, 0xd4, 0x13, 0xdb, 0xbd, 0x4a, 0x53, 0x85, 0x8c, 0xa9, 0xf2, 0x18, 0x25, 0x0c, 0xdf,
-	0xc8, 0xb9, 0xd5, 0x6b, 0x7f, 0xbd, 0xbe, 0x9c, 0x7d, 0x45, 0x20, 0xc2, 0xfb, 0xf1, 0x19, 0xc4,
-	0xdc, 0xd2, 0x8a, 0x09, 0xff, 0x4c, 0x78, 0x79, 0xfd, 0x7b, 0xb7, 0x3f, 0x53, 0x7e, 0x84, 0x0b,
-	0x48, 0x96, 0xc4, 0xff, 0x1e, 0x33, 0x07, 0xb1, 0x24, 0x7e, 0x5a, 0xaf, 0xf1, 0x7c, 0x5f, 0xdb,
-	0x7d, 0xa5, 0xc3, 0x43, 0x5e, 0x84, 0xff, 0xdd, 0xee, 0xbe, 0x03, 0x00, 0x00, 0xff, 0xff, 0x08,
-	0x1d, 0xe9, 0xf8, 0x8b, 0x02, 0x00, 0x00,
+var fileDescriptor_course_1674e2f1a4e76330 = []byte{
+	// 524 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xa4, 0x94, 0x5b, 0x8b, 0xd3, 0x40,
+	0x14, 0xc7, 0x37, 0xb7, 0x89, 0x3d, 0x95, 0xa2, 0x83, 0xae, 0xb1, 0x88, 0xc4, 0x3c, 0xf5, 0xc5,
+	0xb8, 0xd4, 0xcb, 0xfb, 0x52, 0xca, 0xba, 0xa0, 0x2f, 0x79, 0x96, 0x85, 0x9a, 0x39, 0x48, 0x20,
+	0xcd, 0xc4, 0xcc, 0x54, 0x58, 0x3f, 0x80, 0x1f, 0xc1, 0x6f, 0xe1, 0x9b, 0x1f, 0x50, 0x32, 0x97,
+	0x36, 0xcd, 0xa6, 0xa5, 0xb2, 0x4f, 0x99, 0x73, 0xce, 0x3f, 0xe7, 0xf2, 0x9b, 0x0b, 0x3c, 0xaf,
+	0x1b, 0x2e, 0xf9, 0x9b, 0x9c, 0x6f, 0x1a, 0x81, 0xe6, 0x93, 0x2a, 0x1f, 0x9d, 0x20, 0xdb, 0xe4,
+	0xbc, 0xaa, 0x52, 0xed, 0x4d, 0xfe, 0x3a, 0xf0, 0x70, 0xa1, 0x96, 0xcb, 0x4a, 0x16, 0xf2, 0x96,
+	0x4e, 0xc0, 0x2d, 0x58, 0xe4, 0xc4, 0xce, 0x6c, 0x94, 0xb9, 0x05, 0xa3, 0x4f, 0x20, 0x90, 0x85,
+	0x2c, 0x31, 0x72, 0x95, 0x4b, 0x1b, 0x34, 0x86, 0x31, 0x43, 0x91, 0x37, 0x45, 0x2d, 0x0b, 0x5e,
+	0x45, 0x9e, 0x8a, 0x75, 0x5d, 0xf4, 0x1c, 0x88, 0xe4, 0x75, 0x91, 0x8b, 0xc8, 0x8f, 0xbd, 0xd9,
+	0x28, 0x33, 0x16, 0xa5, 0xe0, 0xcb, 0xdb, 0x1a, 0xa3, 0x40, 0xfd, 0xa2, 0xd6, 0xf4, 0x02, 0xc2,
+	0x35, 0x67, 0x9b, 0x12, 0x45, 0x44, 0x62, 0x6f, 0x36, 0x9e, 0x9f, 0xa7, 0xfb, 0x6d, 0xa6, 0x9f,
+	0x55, 0x38, 0xb3, 0xb2, 0xe4, 0x06, 0x1e, 0x5d, 0x32, 0x66, 0xbc, 0xf8, 0x7d, 0x83, 0x42, 0xd2,
+	0x29, 0x3c, 0xd0, 0xea, 0x6b, 0xdb, 0xff, 0xd6, 0xa6, 0x29, 0x10, 0xfd, 0xab, 0x1a, 0xe3, 0x70,
+	0x01, 0xa3, 0x4a, 0x6e, 0xe0, 0x71, 0x27, 0xbf, 0xa8, 0x79, 0x25, 0xb0, 0x2d, 0xa0, 0xc3, 0xbb,
+	0x02, 0xd6, 0xa6, 0xaf, 0x81, 0x60, 0xd3, 0xf0, 0x46, 0x44, 0xae, 0x9a, 0xe0, 0x69, 0xbf, 0xc0,
+	0xb2, 0x8d, 0x66, 0x46, 0x94, 0xfc, 0x76, 0x80, 0xe8, 0xec, 0x77, 0x80, 0x53, 0xf0, 0xab, 0xd5,
+	0xda, 0xf2, 0x56, 0xeb, 0x76, 0x13, 0x78, 0xc3, 0xb0, 0x31, 0xa0, 0xb5, 0xd1, 0xdf, 0x04, 0xff,
+	0xee, 0x26, 0x5c, 0x40, 0x58, 0xa2, 0x10, 0xbc, 0x12, 0x51, 0x30, 0x0c, 0xf6, 0x93, 0x0a, 0x67,
+	0x56, 0x96, 0xfc, 0x54, 0x60, 0x8d, 0xf7, 0x04, 0xb0, 0x5d, 0x26, 0x6e, 0x8f, 0x49, 0x0a, 0x44,
+	0xa7, 0x55, 0x6d, 0x1f, 0x2e, 0x6e, 0x54, 0x06, 0xba, 0xad, 0xbd, 0x83, 0xae, 0xc3, 0xbb, 0xe2,
+	0xd6, 0xfe, 0x5f, 0xe8, 0x5f, 0x80, 0xe8, 0xe4, 0x07, 0x99, 0x7b, 0x43, 0xcc, 0xfd, 0x2e, 0xf3,
+	0x08, 0xc2, 0x1f, 0x05, 0x43, 0x7e, 0xcd, 0xcc, 0x09, 0xb6, 0x66, 0x32, 0x82, 0xd0, 0x00, 0x4b,
+	0xfe, 0x38, 0x30, 0xd1, 0x97, 0x6a, 0x3b, 0xc6, 0x3b, 0x20, 0xba, 0x27, 0x55, 0x75, 0x3c, 0x7f,
+	0xd1, 0x6f, 0xb5, 0x7b, 0x09, 0x33, 0xa3, 0xa5, 0x1f, 0x20, 0xd4, 0x2b, 0x3b, 0xe1, 0xf1, 0xdf,
+	0xac, 0xb8, 0x03, 0xc6, 0x3b, 0x05, 0xcc, 0x7b, 0x08, 0x94, 0xa3, 0xe5, 0x90, 0x73, 0xa6, 0x7b,
+	0x0c, 0x32, 0xb5, 0x6e, 0x27, 0x5e, 0xa3, 0x10, 0xab, 0x6f, 0xf6, 0x48, 0x5a, 0x73, 0xfe, 0xcb,
+	0x03, 0xa2, 0xeb, 0xd3, 0x8f, 0x40, 0x16, 0x0d, 0xae, 0x24, 0xd2, 0xa3, 0x1d, 0x4e, 0x5f, 0x0e,
+	0x47, 0x2d, 0xa6, 0xe4, 0x8c, 0x2e, 0xc1, 0xbb, 0x42, 0x79, 0xef, 0x34, 0x0b, 0x20, 0x57, 0x28,
+	0x2f, 0xcb, 0x92, 0x3e, 0xeb, 0x6b, 0xcd, 0x2e, 0x9d, 0x90, 0x24, 0x83, 0xd1, 0xf6, 0x15, 0xa0,
+	0x71, 0x5f, 0xde, 0x7f, 0x80, 0xa6, 0xaf, 0x8e, 0x28, 0x7a, 0x39, 0xcd, 0x39, 0x1c, 0xca, 0xb9,
+	0x77, 0xf7, 0x06, 0x73, 0xee, 0xdf, 0x90, 0xe4, 0xec, 0x2b, 0x51, 0x6f, 0xfb, 0xdb, 0x7f, 0x01,
+	0x00, 0x00, 0xff, 0xff, 0xd6, 0x4b, 0xf2, 0x7b, 0xf8, 0x05, 0x00, 0x00,
 }

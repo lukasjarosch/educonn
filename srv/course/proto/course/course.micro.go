@@ -9,6 +9,12 @@ It is generated from these files:
 
 It has these top-level messages:
 	CourseEntity
+	AddModuleRequest
+	AddModuleResponse
+	Module
+	AddLessonRequest
+	AddLessonResponse
+	Lesson
 	Request
 	CourseResponse
 	Error
@@ -47,6 +53,8 @@ type CourseClient interface {
 	Create(ctx context.Context, in *CourseEntity, opts ...client.CallOption) (*CourseResponse, error)
 	Get(ctx context.Context, in *CourseEntity, opts ...client.CallOption) (*CourseResponse, error)
 	GetAll(ctx context.Context, in *Request, opts ...client.CallOption) (*CourseResponse, error)
+	AddModule(ctx context.Context, in *AddModuleRequest, opts ...client.CallOption) (*AddModuleResponse, error)
+	AddLesson(ctx context.Context, in *AddLessonRequest, opts ...client.CallOption) (*AddLessonResponse, error)
 }
 
 type courseClient struct {
@@ -97,12 +105,34 @@ func (c *courseClient) GetAll(ctx context.Context, in *Request, opts ...client.C
 	return out, nil
 }
 
+func (c *courseClient) AddModule(ctx context.Context, in *AddModuleRequest, opts ...client.CallOption) (*AddModuleResponse, error) {
+	req := c.c.NewRequest(c.serviceName, "Course.AddModule", in)
+	out := new(AddModuleResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *courseClient) AddLesson(ctx context.Context, in *AddLessonRequest, opts ...client.CallOption) (*AddLessonResponse, error) {
+	req := c.c.NewRequest(c.serviceName, "Course.AddLesson", in)
+	out := new(AddLessonResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Course service
 
 type CourseHandler interface {
 	Create(context.Context, *CourseEntity, *CourseResponse) error
 	Get(context.Context, *CourseEntity, *CourseResponse) error
 	GetAll(context.Context, *Request, *CourseResponse) error
+	AddModule(context.Context, *AddModuleRequest, *AddModuleResponse) error
+	AddLesson(context.Context, *AddLessonRequest, *AddLessonResponse) error
 }
 
 func RegisterCourseHandler(s server.Server, hdlr CourseHandler, opts ...server.HandlerOption) {
@@ -123,4 +153,12 @@ func (h *Course) Get(ctx context.Context, in *CourseEntity, out *CourseResponse)
 
 func (h *Course) GetAll(ctx context.Context, in *Request, out *CourseResponse) error {
 	return h.CourseHandler.GetAll(ctx, in, out)
+}
+
+func (h *Course) AddModule(ctx context.Context, in *AddModuleRequest, out *AddModuleResponse) error {
+	return h.CourseHandler.AddModule(ctx, in, out)
+}
+
+func (h *Course) AddLesson(ctx context.Context, in *AddLessonRequest, out *AddLessonResponse) error {
+	return h.CourseHandler.AddLesson(ctx, in, out)
 }
